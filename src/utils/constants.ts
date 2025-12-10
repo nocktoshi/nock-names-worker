@@ -12,10 +12,10 @@ export const isValidName = (name: string): boolean => {
 };
 
 export const getFee = (name: string): number => {
-	// 100 NOCK PROMO
-	return 100;
-	const nameWithoutSuffix = name.replace('.nock', '');
-	return nameWithoutSuffix.length >= 10 ? 100 : nameWithoutSuffix.length >= 5 ? 500 : 5000;
+	const len = (name?.replace(".nock", "") || "").length;
+	if (len >= 10) return 100;
+	if (len >= 5) return 500;
+	return len ? 5000 : 0;
 };
 
 export const corsHeaders = {
