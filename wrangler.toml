@@ -1,0 +1,11 @@
+name = "nock-names-worker"
+main = "src/worker.ts"
+compatibility_date = "2025-10-08"
+routes = [
+  { pattern = "api.nocknames.com", custom_domain = true }
+]
+
+[[kv_namespaces]]
+binding = "REGISTRY_KV"
+id = "3c8372bd736c4fe799b0e5605e2d56a5"
+preview_id = "a9b716c8ba0e4b5ab770dc7bee1f9dbc"
