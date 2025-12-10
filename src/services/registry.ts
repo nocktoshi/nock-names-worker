@@ -7,6 +7,10 @@ export class RegistryService {
 		return await this.kv.get(`name:${name}`, { type: 'json' });
 	}
 
+	async getRegisteredAddress(address: string): Promise<Registration | null> {
+		return await this.kv.get(`address:${address}`, { type: 'json' });
+	}
+
 	async getPendingName(name: string): Promise<Registration | null> {
 		return await this.kv.get(`pending:${name}`, { type: 'json' });
 	}

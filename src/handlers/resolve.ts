@@ -7,7 +7,7 @@ export async function handleResolve(request: Request, registryService: RegistryS
 	const name = url.searchParams.get('name');
 
 	if (address) {
-		const registration = await registryService.getRegisteredName(address);
+		const registration = await registryService.getRegisteredAddress(address);
 		if (!registration) {
 			return new Response(JSON.stringify({ error: 'Address not registered' }), {
 				status: 404,
