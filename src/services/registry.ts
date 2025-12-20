@@ -3,6 +3,11 @@ import { Registration, Env } from '../types';
 export class RegistryService {
 	constructor(private kv: KVNamespace) {}
 
+	private normalizeEpochMs(ts: number): number {
+		// If someone accidentally passes seconds since epoch, convert to ms.
+		return ts < 1_000_000_000_000 ? ts * 1000 : ts;
+	}
+
 	async getRegisteredName(name: string): Promise<Registration | null> {
 		return await this.kv.get(`name:${name}`, { type: 'json' });
 	}
@@ -29,14 +34,16 @@ export class RegistryService {
 		);
 	}
 
-	async registerName(name: string, address: string, txHash: string): Promise<void> {
+	async registerName(name: string, address: string, txHash: string, timestamp?: number): Promise<void> {
+		const ts = typeof timestamp === 'number' ? this.normalizeEpochMs(timestamp) : Date.now();
 		await this.kv.put(
 			`name:${name}`,
 			JSON.stringify({
 				address,
 				name,
 				status: 'registered',
-				date: new Date().toISOString(),
+				timestamp: ts,
+				date: new Date(ts).toISOString(),
 				txHash,
 			} as Registration)
 		);

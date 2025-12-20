@@ -13,7 +13,7 @@ export async function handleGetPending(request: Request, registryService: Regist
 export async function handleGetVerified(request: Request, registryService: RegistryService): Promise<Response> {
 	const registrations = await registryService.listRegisteredNames();
 
-	return new Response(JSON.stringify(registrations.sort((a, b) => b.timestamp - a.timestamp)), {
+	return new Response(JSON.stringify(registrations.sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))), {
 		status: 200,
 		headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 	});

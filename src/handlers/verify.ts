@@ -76,16 +76,18 @@ export async function handleVerify(
 		}
 
 		// Record payment and registration
+		// Frontend expects `registration.timestamp` to be epoch milliseconds.
+		const asOf = Date.now();
 		await registryService.recordPayment(txHash, {
 			address,
 			name,
 			status: 'registered',
-			timestamp: Date.now(),
-			date: new Date().toISOString(),
+			timestamp: asOf,
+			date: new Date(asOf).toISOString(),
 			txHash,
 		});
 
-		await registryService.registerName(name, address, txHash);
+		await registryService.registerName(name, address, txHash, asOf);
 		await registryService.deletePendingRegistration(name);
 
 		const registration = await registryService.getRegistration(name);
