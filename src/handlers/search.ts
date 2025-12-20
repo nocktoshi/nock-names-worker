@@ -51,10 +51,12 @@ export async function handleSearch(request: Request, registryService: RegistrySe
 		registryService.getPendingName(`${name}.nock`),
 	]);
 
+	const status = registration ? 'registered' : pendingRegistration ? 'pending' : 'available';
+
 	const result = {
 		name: `${name}.nock`,
 		price: getFee(name),
-		isAvailable: !registration && !pendingRegistration,
+		status,
 		owner: registration?.address || pendingRegistration?.address || null,
 		registeredAt: registration?.timestamp || pendingRegistration?.timestamp || null,
 	};
