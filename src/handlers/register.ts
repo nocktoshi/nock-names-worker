@@ -1,7 +1,7 @@
 import { RegistryService } from '../services/registry';
 import { BlockchainService } from '../services/blockchain';
 import { corsHeaders, isValidAddress, isValidName, getFee } from '../utils/constants';
-import { RegisterRequest, VerifyRequest } from '../types';
+import { RegisterRequest, VerifyRequest, Registration } from '../types';
 
 export async function handleRegister(request: Request, registryService: RegistryService): Promise<Response> {
 	const { address, name } = (await request.json()) as RegisterRequest;
@@ -33,18 +33,22 @@ export async function handleRegister(request: Request, registryService: Registry
 	const pendingRegistration = await registryService.getPendingName(name);
 	if (pendingRegistration) {
 		return new Response(
-			JSON.stringify({
-				error:
-					'Name is pre-registered pending payment. This name will be held for one week while payment is pending. Are you the owner? Please send payment to 8s29XUK8Do7QWt2MHfPdd1gDSta6db4c3bQrxP1YdJNfXpL3WPzTT5 to complete the registration.',
-			}),
-			{ status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+			JSON.stringify(
+				pendingRegistration
+			),
+			{ status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
 		);
 	}
 
 	// Create pending registration
 	await registryService.createPendingRegistration(name, address);
 
-	return new Response(JSON.stringify({ key: `pending:${name}:${address}` }), {
+	return new Response(JSON.stringify(
+		{
+			address,
+			name,
+			status: 'pending'
+		} as Registration), {
 		status: 200,
 		headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 	});

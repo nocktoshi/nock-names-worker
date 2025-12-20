@@ -1,6 +1,6 @@
 import { RegistryService } from '../services/registry';
 import { BlockchainService } from '../services/blockchain';
-import { corsHeaders, getFee } from '../utils/constants';
+import { corsHeaders, getFee, PAYMENT_ADDRESS } from '../utils/constants';
 import { VerifyRequest } from '../types';
 
 export async function handleVerify(
@@ -8,13 +8,21 @@ export async function handleVerify(
 	registryService: RegistryService,
 	blockchainService: BlockchainService
 ): Promise<Response> {
-	const { address, name, txHash } = (await request.json()) as VerifyRequest;
+	const { address, name } = (await request.json()) as VerifyRequest;
 
 	try {
 		// Check pending registration
 		const pending = await registryService.getPendingName(name);
 		if (!pending) {
 			return new Response(JSON.stringify({ error: 'No pending registration found' }), {
+				status: 400,
+				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+			});
+		}
+
+		// Ensure the pending registration belongs to the provided address.
+		if (pending.address !== address) {
+			return new Response(JSON.stringify({ error: 'Pending registration does not match provided address.' }), {
 				status: 400,
 				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 			});
@@ -29,34 +37,37 @@ export async function handleVerify(
 			});
 		}
 
-		// Verify transaction
-		const transaction = await blockchainService.fetchTransaction(txHash);
-		if (!transaction) {
-			return new Response(JSON.stringify({ error: 'Invalid transaction' }), {
-				status: 400,
-				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-			});
-		}
-
-		// Verify transaction sender
-		if (!blockchainService.verifyTransactionSender(transaction, address)) {
-			return new Response(JSON.stringify({ error: 'Transaction does not match provided address.' }), {
-				status: 400,
-				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-			});
-		}
-
-		// Verify payment amount
-		const paymentAmount = blockchainService.getPaymentAmount(transaction);
+		// Find a valid payment transaction *to* the payment address.
+		// We query by PAYMENT_ADDRESS (not the user's address) because the destination can be hidden.
 		const requiredFee = getFee(name);
-		if (paymentAmount < requiredFee) {
-			return new Response(JSON.stringify({ error: 'Incorrect payment amount.' }), {
+		const txs = await blockchainService.getTransactionsByAddress(PAYMENT_ADDRESS, 50, 0, address);
+
+		let txHash: string | null = null;
+		let transaction = null as any;
+
+		for (const tx of txs.transactions ?? []) {
+			if (!tx?.id) continue;
+
+			// Prevent replay attacks: skip txs that were already used.
+			if (await registryService.hasPaymentBeenUsed(tx.id)) continue;
+
+			// Ensure the tx pays at least the required fee to the payment address (and is actually an incoming payment).
+			const paymentAmount = blockchainService.getPaymentAmount(tx);
+			if (paymentAmount < requiredFee) continue;
+
+			txHash = tx.id;
+			transaction = tx;
+			break;
+		}
+
+		if (!txHash || !transaction) {
+			return new Response(JSON.stringify({ error: 'No valid payment transaction found for this address.' }), {
 				status: 400,
 				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 			});
 		}
 
-		// Check if payment was already used
+		// Double-check if payment was already used (best-effort replay protection)
 		if (await registryService.hasPaymentBeenUsed(txHash)) {
 			return new Response(JSON.stringify({ error: 'Transaction already used for registration.' }), {
 				status: 400,
@@ -77,7 +88,9 @@ export async function handleVerify(
 		await registryService.registerName(name, address, txHash);
 		await registryService.deletePendingRegistration(name);
 
-		return new Response(JSON.stringify({ message: 'Registration successful!' }), {
+		const registration = await registryService.getRegistration(name);
+
+		return new Response(JSON.stringify({ message: 'Registration successful!', registration }), {
 			status: 200,
 			headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 		});

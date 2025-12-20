@@ -77,4 +77,8 @@ export class RegistryService {
 		const existingPayment = await this.kv.list({ prefix: `payment:${txHash}`, limit: 1 });
 		return existingPayment.keys.length > 0;
 	}
+
+	async getRegistration(name: string): Promise<Registration | null> {
+		return await this.kv.get(`name:${name}`, { type: 'json' });
+	}
 }

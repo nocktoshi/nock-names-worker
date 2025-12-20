@@ -1,6 +1,9 @@
 export const PAYMENT_ADDRESS =
 	'8s29XUK8Do7QWt2MHfPdd1gDSta6db4c3bQrxP1YdJNfXpL3WPzTT5';
 
+export const PAYMENT_FIRST_NAME =
+	'9vXqzHoeNn6RvZVrrs2SJuCAMmaWYcAn6YoF7ch7ALEt3KbCjtLuoC4';
+
 export const isValidAddress = (address: string): boolean => {
 	const trimmedQuery = address.trim();
 	return (trimmedQuery.length > 43 && trimmedQuery.length < 57) || trimmedQuery.length === 132

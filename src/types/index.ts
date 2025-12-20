@@ -1,5 +1,6 @@
 export interface Env {
 	REGISTRY_KV: KVNamespace;
+	NOCKBLOCKS_API_KEY?: string;
 }
 
 export interface RegisterRequest {
@@ -10,8 +11,6 @@ export interface RegisterRequest {
 export interface VerifyRequest {
 	address: string;
 	name: string;
-	txHash: string;
-	adminCode?: string;
 }
 
 export interface Registration {

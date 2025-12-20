@@ -21,7 +21,7 @@ export default {
 
 	// Initialize services
 	const registryService = new RegistryService(env.REGISTRY_KV);
-	const blockchainService = new BlockchainService();
+	const blockchainService = new BlockchainService(env.NOCKBLOCKS_API_KEY);
 
 	type Handler = () => Promise<Response>;
 	type PostRoutes = {
