@@ -1,0 +1,401 @@
+:root {
+  /* Copied from nocknames.com tokens (trimmed to what we use) */
+  --button-outline: #ffffff1a;
+  --badge-outline: #ffffff0d;
+  --elevate-1: #ffffff0a;
+  --elevate-2: #ffffff17;
+
+  --background: 220 15% 8%;
+  --foreground: 210 20% 98%;
+  --border: 220 15% 15%;
+  --card: 220 15% 12%;
+  --card-foreground: 210 20% 98%;
+  --card-border: 220 15% 18%;
+  --muted: 220 15% 16%;
+  --muted-foreground: 210 10% 70%;
+  --primary: 260 90% 65%;
+  --primary-foreground: 220 15% 8%;
+  --ring: 260 75% 60%;
+
+  --shadow-xs: 0px 1px 3px 0px #0003;
+  --shadow-sm: 0px 1px 2px 0px #00000026, 0px 2px 4px -1px #0003;
+  --shadow-lg: 0px 10px 15px -3px #0003, 0px 4px 6px -2px #00000026;
+
+  --radius: 10px;
+}
+
+/* Berkeley Mono (hosted by nocknames.com). If you want this fully offline,
+   drop your licensed font files in api-docs/fonts and update these URLs. */
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("https://nocknames.com/assets/BerkeleyMono-Regular-B5gW6inG.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("https://nocknames.com/assets/BerkeleyMono-Oblique-C7AN4KDX.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("https://nocknames.com/assets/BerkeleyMono-Bold-2lhFUpWX.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Berkeley Mono";
+  src: url("https://nocknames.com/assets/BerkeleyMono-Bold-Oblique-cdn8bbNG.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: hsl(var(--foreground) / 1);
+  background: hsl(var(--background) / 1);
+  font-family: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 800px at 50% 20%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(1000px 700px at 20% 80%, rgba(168, 85, 247, 0.14), transparent 55%),
+    hsl(220 20% 6%);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  background: color-mix(in oklab, hsl(var(--background) / 1) 70%, transparent);
+  border-bottom: 1px solid hsl(var(--border) / 1);
+}
+
+.topbar-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #8b55f6, #3377ff, #00ffff);
+  box-shadow: 0 0 18px rgba(139, 85, 246, 0.35);
+}
+.brand-text {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.brand-subtle {
+  color: hsl(var(--muted-foreground) / 1);
+  font-size: 12px;
+}
+
+.topnav {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground) / 1);
+}
+.topnav a {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.topnav a:hover {
+  color: hsl(var(--foreground) / 1);
+  border-color: hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--muted) / 1) 65%, transparent);
+}
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 18px 60px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+}
+
+.sidebar {
+  position: sticky;
+  top: 76px;
+  height: fit-content;
+}
+
+.sidebar-card {
+  border: 1px solid hsl(var(--card-border) / 1);
+  background: color-mix(in oklab, hsl(var(--card) / 1) 85%, transparent);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow-xs);
+}
+
+.side-link {
+  display: block;
+  padding: 8px 10px;
+  margin: 4px 0;
+  border-radius: 10px;
+  color: hsl(var(--muted-foreground) / 1);
+  border: 1px solid transparent;
+}
+.side-link:hover {
+  color: hsl(var(--foreground) / 1);
+  border-color: hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--muted) / 1) 75%, transparent);
+}
+
+.content {
+  min-width: 0;
+}
+
+.hero {
+  padding: 20px;
+  border-radius: calc(var(--radius) + 2px);
+  border: 1px solid hsl(var(--card-border) / 1);
+  background: linear-gradient(
+      135deg,
+      rgba(139, 85, 246, 0.10),
+      rgba(51, 119, 255, 0.06),
+      rgba(0, 255, 255, 0.10)
+    );
+  box-shadow: var(--shadow-sm);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--background) / 1) 75%, transparent);
+  font-size: 12px;
+  color: hsl(var(--muted-foreground) / 1);
+}
+
+h1 {
+  margin: 14px 0 8px;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 10px 0;
+  line-height: 1.65;
+}
+
+.lead {
+  color: hsl(var(--muted-foreground) / 1);
+  margin-bottom: 12px;
+}
+
+.grad {
+  background: linear-gradient(135deg, #8b55f6, #3377ff, #00ffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section {
+  margin-top: 18px;
+  padding-top: 6px;
+}
+
+.endpoint {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--card-border) / 1);
+  background: color-mix(in oklab, hsl(var(--card) / 1) 85%, transparent);
+  box-shadow: var(--shadow-xs);
+}
+
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.method {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--muted) / 1) 75%, transparent);
+}
+.method.get {
+  color: color-mix(in oklab, rgb(99, 102, 241) 85%, white);
+}
+.method.post {
+  color: color-mix(in oklab, rgb(168, 85, 247) 80%, white);
+}
+.path {
+  font-size: 13px;
+  color: hsl(var(--foreground) / 1);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 980px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  border: 1px solid hsl(var(--card-border) / 1);
+  background: color-mix(in oklab, hsl(var(--card) / 1) 88%, transparent);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow-xs);
+}
+
+.kicker {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground) / 1);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.mono {
+  font-family: inherit;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.subtle {
+  color: hsl(var(--muted-foreground) / 1);
+}
+
+.spacer {
+  height: 12px;
+}
+
+.param-list {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+  color: hsl(var(--muted-foreground) / 1);
+}
+.param-list li {
+  margin: 6px 0;
+}
+
+.params {
+  margin: 12px 0 0;
+}
+
+.code-inline {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--muted) / 1) 70%, transparent);
+}
+
+.codeblock {
+  position: relative;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, hsl(var(--border) / 1) 70%, transparent);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.codeblock pre {
+  margin: 0;
+  padding: 12px 12px;
+  overflow: auto;
+}
+.codeblock code {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 1px solid hsl(var(--border) / 1);
+  background: color-mix(in oklab, hsl(var(--background) / 1) 65%, transparent);
+  color: hsl(var(--foreground) / 1);
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.copy:hover {
+  background: linear-gradient(135deg, #8b55f6, #3377ff, #00ffff);
+  border-color: transparent;
+}
+
+.mt {
+  margin-top: 12px;
+}
+
+.footer {
+  margin-top: 22px;
+  padding: 14px 2px;
+}
+
+

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NockNames API Docs</title>
+    <meta name="description" content="NockNames API documentation with curl examples." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="#top" aria-label="NockNames API Docs home">
+          <span class="brand-dot" aria-hidden="true"></span>
+          <span class="brand-text">nocknames</span>
+          <span class="brand-subtle">api docs</span>
+        </a>
+        <nav class="topnav" aria-label="Primary">
+          <a href="#quickstart">Quickstart</a>
+          <a href="#endpoints">Endpoints</a>
+          <a href="#errors">Errors</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top" class="layout">
+      <aside class="sidebar" aria-label="Sidebar navigation">
+        <div class="sidebar-card">
+          <div class="kicker">Base URL</div>
+          <div class="mono small code-inline">https://api.nocknames.com</div>
+          <div class="spacer"></div>
+
+          <div class="kicker">Endpoints</div>
+          <a class="side-link" href="#resolve">GET /resolve</a>
+          <a class="side-link" href="#search">GET /search</a>
+          <a class="side-link" href="#pending">GET /pending</a>
+          <a class="side-link" href="#verified">GET /verified</a>
+          <a class="side-link" href="#register">POST /register</a>
+          <a class="side-link" href="#verify">POST /verify</a>
+        </div>
+      </aside>
+
+      <section class="content" aria-label="Documentation content">
+        <section class="hero">
+          <div class="pill">NockNames API</div>
+          <h1>Resolve, search, and register <span class="grad">.nock</span> names.</h1>
+          <p class="lead">
+            A small JSON API backing NockNames. No auth. CORS enabled.
+          </p>
+          <div class="grid2">
+            <div class="card">
+              <div class="kicker">Example</div>
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/resolve?name=regen.nock'</code></pre>
+                <button class="copy" type="button" aria-label="Copy curl command">Copy</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="kicker">Response</div>
+              <div class="codeblock">
+                <pre><code>{
+  "address": "8s29XU…TT5"
+}</code></pre>
+              </div>
+              <div class="small subtle">Example only — actual address depends on registry state.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="quickstart" class="section">
+          <h2>Quickstart</h2>
+          <p>
+            The API responds with JSON and uses standard HTTP status codes. All endpoints support CORS.
+          </p>
+          <div class="card">
+            <div class="kicker">Resolve a name</div>
+            <div class="codeblock" data-copy>
+              <pre><code>curl 'https://api.nocknames.com/resolve?name=regen.nock'</code></pre>
+              <button class="copy" type="button">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="endpoints" class="section">
+          <h2>Endpoints</h2>
+
+          <article id="resolve" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method get">GET</div>
+              <div class="path">/resolve</div>
+            </div>
+            <p class="subtle">
+              Resolve in either direction: <span class="mono">name → address</span> or <span class="mono">address → name</span>.
+            </p>
+            <div class="params">
+              <div class="kicker">Query parameters</div>
+              <ul class="param-list">
+                <li><span class="mono">name</span> (string) — Must match <span class="mono">/^[a-z0-9]+\.nock$/</span>.</li>
+                <li><span class="mono">address</span> (string) — Blockchain address.</li>
+              </ul>
+              <div class="small subtle">Provide exactly one of <span class="mono">name</span> or <span class="mono">address</span>.</div>
+            </div>
+
+            <div class="grid2">
+              <div class="card">
+                <div class="kicker">Resolve name → address</div>
+                <div class="codeblock" data-copy>
+                  <pre><code>curl 'https://api.nocknames.com/resolve?name=regen.nock'</code></pre>
+                  <button class="copy" type="button">Copy</button>
+                </div>
+                <div class="kicker mt">200</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "address": "…"
+}</code></pre>
+                </div>
+                <div class="kicker mt">404</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "error": "Name not registered"
+}</code></pre>
+                </div>
+              </div>
+              <div class="card">
+                <div class="kicker">Resolve address → name</div>
+                <div class="codeblock" data-copy>
+                  <pre><code>curl 'https://api.nocknames.com/resolve?address=8s29XUK8Do7QWt2MHfPdd1gDSta6db4c3bQrxP1YdJNfXpL3WPzTT5'</code></pre>
+                  <button class="copy" type="button">Copy</button>
+                </div>
+                <div class="kicker mt">200</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "name": "regen.nock"
+}</code></pre>
+                </div>
+                <div class="kicker mt">400</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "error": "Missing address or name parameter"
+}</code></pre>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article id="search" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method get">GET</div>
+              <div class="path">/search</div>
+            </div>
+            <p class="subtle">
+              Check availability/status for a name, or list registrations for an address.
+            </p>
+
+            <div class="params">
+              <div class="kicker">Query parameters</div>
+              <ul class="param-list">
+                <li>
+                  <span class="mono">name</span> (string) — A label or full domain. Both
+                  <span class="mono">regen</span> and <span class="mono">regen.nock</span> are accepted.
+                </li>
+                <li><span class="mono">address</span> (string) — Blockchain address.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="kicker">Search a name</div>
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/search?name=regen.nock'</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+              <div class="kicker mt">200</div>
+              <div class="codeblock">
+                <pre><code>{
+  "name": "regen.nock",
+  "price": 500,
+  "status": "available | pending | registered",
+  "owner": "… | null",
+  "registeredAt": 1730000000000 | null
+}</code></pre>
+              </div>
+              <div class="small subtle">
+                Pricing is based on the label length (see <a href="#pricing">Pricing</a>).
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="kicker">Search by address</div>
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/search?address=8s29XUK8Do7QWt2MHfPdd1gDSta6db4c3bQrxP1YdJNfXpL3WPzTT5'</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+              <div class="kicker mt">200</div>
+              <div class="codeblock">
+                <pre><code>{
+  "address": "…",
+  "pending": [
+    { "address": "…", "name": "regen.nock", "status": "pending", "timestamp": 1730000000000 }
+  ],
+  "verified": [
+    { "address": "…", "name": "regen.nock", "status": "registered", "timestamp": 1730000000000, "date": "…", "txHash": "…" }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article id="pending" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method get">GET</div>
+              <div class="path">/pending</div>
+            </div>
+            <p class="subtle">List pending registrations (most recent first).</p>
+            <div class="card">
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/pending'</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+              <div class="kicker mt">200</div>
+              <div class="codeblock">
+                <pre><code>[
+  { "address": "…", "name": "regen.nock", "status": "pending", "timestamp": 1730000000000 }
+]</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article id="verified" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method get">GET</div>
+              <div class="path">/verified</div>
+            </div>
+            <p class="subtle">List registered names (most recent first).</p>
+            <div class="card">
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/verified'</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+              <div class="kicker mt">200</div>
+              <div class="codeblock">
+                <pre><code>[
+  { "address": "…", "name": "regen.nock", "status": "registered", "timestamp": 1730000000000, "date": "…", "txHash": "…" }
+]</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article id="register" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method post">POST</div>
+              <div class="path">/register</div>
+            </div>
+            <p class="subtle">Create a pending registration for a name and address.</p>
+
+            <div class="grid2">
+              <div class="card">
+                <div class="kicker">Request</div>
+                <div class="codeblock" data-copy>
+                  <pre><code>curl -X POST 'https://api.nocknames.com/register' \
+  -H 'Content-Type: application/json' \
+  -d '{"address":"8s29XU…TT5","name":"regen.nock"}'</code></pre>
+                  <button class="copy" type="button">Copy</button>
+                </div>
+                <div class="kicker mt">Body</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "address": "string",
+  "name": "lowercase alphanumeric + .nock"
+}</code></pre>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="kicker">200</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "address": "…",
+  "name": "regen.nock",
+  "status": "pending",
+  "timestamp": 1730000000000
+}</code></pre>
+                </div>
+                <div class="kicker mt">400</div>
+                <div class="codeblock">
+                  <pre><code>{ "error": "Name already registered | Invalid blockchain address | Name must be alphanumeric lowercase and end with .nock" }</code></pre>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article id="verify" class="endpoint">
+            <div class="endpoint-head">
+              <div class="method post">POST</div>
+              <div class="path">/verify</div>
+            </div>
+            <p class="subtle">
+              Verify payment and finalize registration. This checks for an unused payment transaction from the provided address
+              that pays at least the required fee to the NockNames payment address.
+            </p>
+
+            <div class="card">
+              <div class="kicker">Payment address</div>
+              <div class="codeblock" data-copy>
+                <pre><code>8s29XUK8Do7QWt2MHfPdd1gDSta6db4c3bQrxP1YdJNfXpL3WPzTT5</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+            </div>
+
+            <div id="pricing" class="card">
+              <div class="kicker">Pricing (label length)</div>
+              <ul class="param-list">
+                <li><span class="mono">len ≥ 10</span> → <span class="mono">100</span></li>
+                <li><span class="mono">len ≥ 5</span> → <span class="mono">500</span></li>
+                <li><span class="mono">len 1–4</span> → <span class="mono">5000</span></li>
+              </ul>
+            </div>
+
+            <div class="grid2">
+              <div class="card">
+                <div class="kicker">Request</div>
+                <div class="codeblock" data-copy>
+                  <pre><code>curl -X POST 'https://api.nocknames.com/verify' \
+  -H 'Content-Type: application/json' \
+  -d '{"address":"8s29XU…TT5","name":"regen.nock"}'</code></pre>
+                  <button class="copy" type="button">Copy</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="kicker">200</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "message": "Registration successful!",
+  "registration": {
+    "address": "…",
+    "name": "regen.nock",
+    "status": "registered",
+    "timestamp": 1730000000000,
+    "date": "2025-01-01T00:00:00.000Z",
+    "txHash": "…"
+  }
+}</code></pre>
+                </div>
+                <div class="kicker mt">400</div>
+                <div class="codeblock">
+                  <pre><code>{
+  "error": "No pending registration found | Pending registration does not match provided address. | Name already registered | No valid payment transaction found for this address. | Transaction already used for registration."
+}</code></pre>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section id="errors" class="section">
+          <h2>Errors</h2>
+          <p class="subtle">
+            Errors are returned as JSON with an <span class="mono">error</span> string.
+          </p>
+          <div class="card">
+            <div class="codeblock">
+              <pre><code>{
+  "error": "…"
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <div class="small subtle">
+            Built to match the look-and-feel of <span class="mono">nocknames.com</span> (Berkeley Mono + token palette).
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
+

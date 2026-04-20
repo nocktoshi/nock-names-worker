@@ -67,7 +67,7 @@ export async function handleVerify(
 			});
 		}
 
-		// Double-check if payment was already used (best-effort replay protection)
+		// Claim the tx hash immediately to minimize the race window with concurrent requests.
 		if (await registryService.hasPaymentBeenUsed(txHash)) {
 			return new Response(JSON.stringify({ error: 'Transaction already used for registration.' }), {
 				status: 400,
@@ -75,22 +75,19 @@ export async function handleVerify(
 			});
 		}
 
-		// Record payment and registration
-		// Frontend expects `registration.timestamp` to be epoch milliseconds.
 		const asOf = Date.now();
-		await registryService.recordPayment(txHash, {
+		const registration = {
 			address,
 			name,
-			status: 'registered',
+			status: 'registered' as const,
 			timestamp: asOf,
 			date: new Date(asOf).toISOString(),
 			txHash,
-		});
+		};
 
+		await registryService.recordPayment(txHash, registration);
 		await registryService.registerName(name, address, txHash, asOf);
 		await registryService.deletePendingRegistration(name);
-
-		const registration = await registryService.getRegistration(name);
 
 		return new Response(JSON.stringify({ message: 'Registration successful!', registration }), {
 			status: 200,

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nocknames.com API Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0e14;
+  --bg-card: #14171f;
+  --bg-card-hover: #1a1e28;
+  --border: #1e2330;
+  --text: #e2e4ea;
+  --text-dim: #6b7085;
+  --text-muted: #454a5e;
+  --cyan: #44d9e8;
+  --green: #a3e635;
+  --purple: #c084fc;
+  --amber: #fbbf24;
+  --rose: #fb7185;
+  --blue: #60a5fa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  padding: 40px 36px 48px;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 15% 8%, rgba(68,217,232,0.035) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 85%, rgba(163,230,53,0.025) 0%, transparent 50%);
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+.subtitle code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: rgba(68,217,232,0.08);
+  color: var(--cyan);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(68,217,232,0.12);
+}
+
+/* ═══ MAIN 3-COLUMN GRID ═══ */
+.arch {
+  display: grid;
+  grid-template-columns: 175px 1fr 255px;
+  gap: 28px;
+  max-width: 1140px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.col-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* ── Endpoints ── */
+.ep {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  opacity: 0;
+  animation: slideIn .35s ease forwards;
+  transition: transform .12s;
+}
+.ep:hover { transform: translateX(3px); }
+
+.m {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  min-width: 36px;
+  text-align: center;
+}
+.m.post { background: rgba(251,113,133,.13); color: var(--rose); border: 1px solid rgba(251,113,133,.22); }
+.m.get  { background: rgba(163,230,53,.1);  color: var(--green); border: 1px solid rgba(163,230,53,.18); }
+
+.p { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; }
+
+.sep { height: 1px; background: var(--border); margin: 8px 0; opacity: .4; }
+
+/* ── Handler cards ── */
+.hc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-bottom: 6px;
+  position: relative;
+  transition: all .15s;
+  opacity: 0;
+  animation: slideIn .35s ease forwards;
+}
+.hc:hover { background: var(--bg-card-hover); border-color: rgba(68,217,232,.18); transform: translateX(2px); }
+
+.hc .dots { position: absolute; top: 9px; right: 10px; display: flex; gap: 4px; }
+.hc .dots span { width: 6px; height: 6px; border-radius: 50%; display: block; }
+
+.hn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 3px;
+}
+
+.hd {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  font-weight: 300;
+}
+
+.tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 12px;
+  letter-spacing: .3px;
+}
+.tag.reg { background: rgba(192,132,252,.1); color: var(--purple); border: 1px solid rgba(192,132,252,.18); }
+.tag.bc  { background: rgba(251,191,36,.08); color: var(--amber);  border: 1px solid rgba(251,191,36,.16); }
+
+/* ── Service cards ── */
+.sc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: slideIn .4s ease forwards;
+}
+
+.sh { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+
+.sd {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.sd.purple { background: var(--purple); box-shadow: 0 0 6px rgba(192,132,252,.35); }
+.sd.amber  { background: var(--amber);  box-shadow: 0 0 6px rgba(251,191,36,.35); }
+.sd.cyan   { background: var(--cyan);   box-shadow: 0 0 6px rgba(68,217,232,.35); }
+
+.sn { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
+
+.sr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  padding: 2px 0;
+  display: flex;
+  gap: 7px;
+}
+.sr .k { color: var(--text-dim); min-width: 44px; }
+.sr .v { color: var(--cyan); }
+.sr .v.purple { color: var(--purple); }
+.sr .v.amber  { color: var(--amber); }
+
+hr.dv { border: none; border-top: 1px dashed var(--border); margin: 8px 0; }
+
+/* ═══ FLOW + FEE ═══ */
+.bottom {
+  max-width: 1140px;
+  margin: 32px auto 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: end;
+}
+
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.fn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 16px;
+  text-align: center;
+  min-width: 110px;
+  opacity: 0;
+  animation: slideUp .35s ease forwards;
+}
+.fn .fl { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; }
+.fn .fs { font-size: 9px; color: var(--text-dim); margin-top: 2px; font-weight: 300; }
+
+.fn.hl-rose   { border-color: rgba(251,113,133,.2); }
+.fn.hl-cyan   { border-color: rgba(68,217,232,.2); }
+.fn.hl-green  { border-color: rgba(163,230,53,.2); }
+.fn.hl-purple { border-color: rgba(192,132,252,.2); }
+.fn.hl-amber  { border-color: rgba(251,191,36,.2); }
+
+.fa {
+  color: var(--text-muted);
+  font-size: 16px;
+  padding: 0 10px;
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0;
+  animation: fadeIn .25s ease forwards;
+}
+
+.fee-row { display: flex; gap: 10px; }
+
+.fb {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  opacity: 0;
+  animation: slideUp .35s ease forwards;
+}
+.fb .ch { color: var(--text-dim); }
+.fb .pr { color: var(--green); font-weight: 600; margin-left: 6px; }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+@keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+
+.ep:nth-child(1){animation-delay:.0s} .ep:nth-child(2){animation-delay:.04s}
+.ep:nth-child(4){animation-delay:.08s} .ep:nth-child(5){animation-delay:.12s}
+.ep:nth-child(6){animation-delay:.16s} .ep:nth-child(7){animation-delay:.20s}
+
+.hc:nth-child(2){animation-delay:.05s} .hc:nth-child(3){animation-delay:.1s}
+.hc:nth-child(4){animation-delay:.15s} .hc:nth-child(5){animation-delay:.2s}
+.hc:nth-child(6){animation-delay:.25s} .hc:nth-child(7){animation-delay:.3s}
+
+.sc:nth-child(2){animation-delay:.08s} .sc:nth-child(3){animation-delay:.16s}
+
+.fn:nth-child(1){animation-delay:.4s} .fa:nth-child(2){animation-delay:.44s}
+.fn:nth-child(3){animation-delay:.48s} .fa:nth-child(4){animation-delay:.52s}
+.fn:nth-child(5){animation-delay:.56s} .fa:nth-child(6){animation-delay:.60s}
+.fn:nth-child(7){animation-delay:.64s} .fa:nth-child(8){animation-delay:.68s}
+.fn:nth-child(9){animation-delay:.72s}
+
+.fb:nth-child(1){animation-delay:.8s} .fb:nth-child(2){animation-delay:.84s} .fb:nth-child(3){animation-delay:.88s}
+</style>
+</head>
+<body>
+
+<h1>nocknames.com API Architecture</h1>
+<p class="subtitle"><code>api.nocknames.com</code> &mdash; Cloudflare Worker &bull; KV Store &bull; nockblocks RPC</p>
+
+<div class="arch">
+
+  <!-- ENDPOINTS -->
+  <div>
+    <div class="col-label">Endpoints</div>
+    <div class="ep"><span class="m post">POST</span><span class="p">/register</span></div>
+    <div class="ep"><span class="m post">POST</span><span class="p">/verify</span></div>
+    <div class="sep"></div>
+    <div class="ep"><span class="m get">GET</span><span class="p">/pending</span></div>
+    <div class="ep"><span class="m get">GET</span><span class="p">/verified</span></div>
+    <div class="ep"><span class="m get">GET</span><span class="p">/resolve</span></div>
+    <div class="ep"><span class="m get">GET</span><span class="p">/search</span></div>
+  </div>
+
+  <!-- HANDLERS -->
+  <div>
+    <div class="col-label">Handlers</div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span></div>
+      <div class="hn">handleRegister</div>
+      <div class="hd">Validates address &amp; name, creates pending registration (7-day TTL)</div>
+      <div class="tags"><span class="tag reg">RegistryService</span></div>
+    </div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span><span style="background:var(--amber)"></span></div>
+      <div class="hn">handleVerify</div>
+      <div class="hd">Queries blockchain for payment tx, verifies fee, records payment &amp; finalizes registration</div>
+      <div class="tags"><span class="tag reg">RegistryService</span><span class="tag bc">BlockchainService</span></div>
+    </div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span></div>
+      <div class="hn">handleGetPending</div>
+      <div class="hd">Lists pending registrations sorted by timestamp (limit 100)</div>
+      <div class="tags"><span class="tag reg">RegistryService</span></div>
+    </div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span></div>
+      <div class="hn">handleGetVerified</div>
+      <div class="hd">Lists confirmed registrations sorted by timestamp (limit 100)</div>
+      <div class="tags"><span class="tag reg">RegistryService</span></div>
+    </div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span></div>
+      <div class="hn">handleResolve</div>
+      <div class="hd">Bidirectional lookup &mdash; address &rarr; name or name &rarr; address</div>
+      <div class="tags"><span class="tag reg">RegistryService</span></div>
+    </div>
+
+    <div class="hc">
+      <div class="dots"><span style="background:var(--purple)"></span></div>
+      <div class="hn">handleSearch</div>
+      <div class="hd">Search by address or name, returns availability &amp; price via getFee()</div>
+      <div class="tags"><span class="tag reg">RegistryService</span></div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div>
+    <div class="col-label">Services &amp; Storage</div>
+
+    <div class="sc">
+      <div class="sh"><div class="sd purple"></div><div class="sn">RegistryService</div></div>
+      <div class="sr"><span class="k">store</span><span class="v purple">Cloudflare KV</span></div>
+      <div class="sr"><span class="k">binding</span><span class="v">REGISTRY_KV</span></div>
+      <hr class="dv">
+      <div class="sr"><span class="k">key</span><span class="v">name:&lt;name&gt;</span></div>
+      <div class="sr"><span class="k">key</span><span class="v">address:&lt;addr&gt;</span></div>
+      <div class="sr"><span class="k">key</span><span class="v">pending:&lt;name&gt;</span></div>
+      <div class="sr"><span class="k">key</span><span class="v">payment:&lt;txHash&gt;</span></div>
+    </div>
+
+    <div class="sc">
+      <div class="sh"><div class="sd amber"></div><div class="sn">BlockchainService</div></div>
+      <div class="sr"><span class="k">proto</span><span class="v amber">JSON-RPC 2.0</span></div>
+      <div class="sr"><span class="k">host</span><span class="v">nockblocks.com/rpc/v1</span></div>
+      <hr class="dv">
+      <div class="sr"><span class="k">call</span><span class="v">getTransactionsByAddress</span></div>
+      <div class="sr"><span class="k">call</span><span class="v">getTransactionById</span></div>
+      <div class="sr"><span class="k">auth</span><span class="v">Bearer &lt;API_KEY&gt;</span></div>
+    </div>
+
+    <div class="sc">
+      <div class="sh"><div class="sd cyan"></div><div class="sn">CORS</div></div>
+      <div class="sr"><span class="k">origin</span><span class="v">*</span></div>
+      <div class="sr"><span class="k">methods</span><span class="v">GET, POST, OPTIONS</span></div>
+      <div class="sr"><span class="k">headers</span><span class="v">Content-Type</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FLOW + PRICING -->
+<div class="bottom">
+  <div>
+    <div class="col-label">Request Flow</div>
+    <div class="flow-row">
+      <div class="fn hl-rose"><div class="fl">Client</div><div class="fs">HTTP Request</div></div>
+      <div class="fa">&#x2192;</div>
+      <div class="fn hl-cyan"><div class="fl">Worker</div><div class="fs">CORS + Routing</div></div>
+      <div class="fa">&#x2192;</div>
+      <div class="fn hl-green"><div class="fl">Handler</div><div class="fs">Validate &amp; Process</div></div>
+      <div class="fa">&#x2192;</div>
+      <div class="fn hl-purple"><div class="fl">KV Store</div><div class="fs">Cloudflare KV</div></div>
+      <div class="fa">&#x2192;</div>
+      <div class="fn hl-amber"><div class="fl">Blockchain</div><div class="fs">nockblocks RPC</div></div>
+    </div>
+  </div>
+  <div>
+    <div class="col-label">Name Pricing</div>
+    <div class="fee-row">
+      <div class="fb"><span class="ch">1&ndash;4 chars</span><span class="pr">5,000</span></div>
+      <div class="fb"><span class="ch">5&ndash;9 chars</span><span class="pr">500</span></div>
+      <div class="fb"><span class="ch">10+</span><span class="pr">100</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

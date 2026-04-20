@@ -81,8 +81,8 @@ export class RegistryService {
 	}
 
 	async hasPaymentBeenUsed(txHash: string): Promise<boolean> {
-		const existingPayment = await this.kv.list({ prefix: `payment:${txHash}`, limit: 1 });
-		return existingPayment.keys.length > 0;
+		const existing = await this.kv.get(`payment:${txHash}`);
+		return existing !== null;
 	}
 
 	async getRegistration(name: string): Promise<Registration | null> {
