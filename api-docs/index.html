@@ -231,10 +231,14 @@
               <div class="method get">GET</div>
               <div class="path">/verified</div>
             </div>
-            <p class="subtle">List registered names (most recent first).</p>
+            <p class="subtle">List registered names (most recent first). Optional filters: <code>?address=...</code> or <code>?name=...</code> (with or without .nock).</p>
             <div class="card">
               <div class="codeblock" data-copy>
-                <pre><code>curl 'https://api.nocknames.com/verified'</code></pre>
+                <pre><code>curl 'https://api.nocknames.com/verified?address=ADbTievFasyuKCfTPSfQyRmLQjzkTUgtoYJqK7Ebo3q2wRbg87G81jT'</code></pre>
+                <button class="copy" type="button">Copy</button>
+              </div>
+              <div class="codeblock" data-copy>
+                <pre><code>curl 'https://api.nocknames.com/verified?name=regen'</code></pre>
                 <button class="copy" type="button">Copy</button>
               </div>
               <div class="kicker mt">200</div>
